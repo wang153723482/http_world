@@ -1,11 +1,13 @@
 package com.wangc;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sun.misc.Request;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Enumeration;
 
 /**
@@ -67,6 +69,33 @@ public class HelloController {
         }
         System.out.println(result);
         return "server get your heads.\n"+result;
+    }
+    
+    @RequestMapping(value = "helloUpload",method = RequestMethod.POST)
+    public String helloUpload(@RequestParam MultipartFile file,
+                              @RequestParam String name,
+                              @RequestParam String age){
+        String fileAllPath = System.getProperty("user.dir")+File.separator + file.getOriginalFilename(); //完整路径
+        System.out.println( fileAllPath );
+        if (!file.isEmpty()) {
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(
+                                new File(fileAllPath)));
+                out.write(file.getBytes());
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            System.out.println("file is empty.");
+        }
+        return "file is save at:"+fileAllPath
+                +"<br>name:"+name
+                +"<br>age:"+age;
     }
 
 }
