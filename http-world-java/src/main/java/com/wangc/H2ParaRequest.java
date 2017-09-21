@@ -49,7 +49,7 @@ public class H2ParaRequest {
     }
     
     
-    //使用 StringEntity 构造请求
+    //使用 StringEntity 构造请求，尽量使用这种方法
     public static void post2() throws Exception{
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
