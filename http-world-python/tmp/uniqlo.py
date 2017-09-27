@@ -7,6 +7,11 @@ import time
 import logging
 import json
 import random
+import smtplib
+from email.mime.text import MIMEText
+import os
+import time
+
 
 # 1.定时执行  （使用系统定时任务）
 # 2.爬取多个目标url
@@ -16,14 +21,18 @@ import random
 
 
 
-url = 'http://www.uniqlo.cn/item.htm?spm=0.0.0.0.WyizUE&id=556952180526&frm=&'
+url = 'http://www.uniqlo.cn/item.htm?spm=0.0.0.0.WyizUE&id=556952180526&frm=&' #测试用
 
 urls = ['http://www.uniqlo.cn/item.htm?spm=0.0.0.0.WyizUE&id=556952180526&frm=&',
-        'http://www.uniqlo.cn/item.htm?id=556207231623&frm=&']
+        'http://www.uniqlo.cn/item.htm?id=556207231623&frm=&',
+        'http://www.uniqlo.cn/item.htm?spm=0.0.0.0.UWd8iI&id=554797856517']
 
 proxies = [
     '10.7.13.155:11080'
+    # '10.7.13.154:9080'
 ]
+
+interval = 600
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -34,10 +43,15 @@ logging.basicConfig(level=logging.DEBUG,
 
 # 
 def main():
-    logging.info("ssss")
-    stander()
+    logging.info('program is start...')
+    while True:
+        check_uniqlo()
+        time.sleep(interval)
 
-def main1():
+
+def check_uniqlo():
+    init()
+
     headers = {
         'Host': 'www.uniqlo.cn',
         'Connection': 'keep-alive',
@@ -55,35 +69,42 @@ def main1():
     prices = json.load(pfr)
     pfr.close()
 
-    proxy_support = urllib2.ProxyHandler({'http':
-                                          # 'http://127.0.0.1:9080'
-                                          # 'http://10.7.13.155:10080'
-                                              proxies[random.randint(0, len(proxies) - 1)]
-                                          })
+    proxy_support = urllib2.ProxyHandler({'http': proxies[random.randint(0, len(proxies) - 1)]})
     opener = urllib2.build_opener(proxy_support)
     urllib2.install_opener(opener)
 
     for url in urls:
-        print url
+        logging.info(url)
         req = urllib2.Request(url, None, headers)
-        resp = urllib2.urlopen(req,timeout=5)
+        resp = urllib2.urlopen(req, timeout=5)
         html = gzdecode(resp.read())
         pq_html = pq(html)
         # print html
         title = pq_html('title').html()
         price = pq_html('#J_StrPrice').text()
         logging.info(title + ',' + price)
+        logging.info('json data:' + str(prices.get(title, 999999999999)))
 
         if not prices.has_key(title):
             prices[title] = price
-        elif float(prices.get(title, 999999999999)) < float(price):
-            print 'send email'
+        elif float(prices.get(title, 999999999999)) > float(price):
+            prices[title] = price
+            logging.info('send email')
+            send_mail('Price change', title + '=======' + price + '\n\r' + url)
         else:
-            print '价格没有变化。。。。。。。。'
+            logging.info('price not change.......')
 
     pfw = open('result.json', 'w')
     json.dump(prices, pfw)
     pfw.close()
+
+
+def init():
+    if not os.path.exists('result.json'):
+        f = open('result.json', 'w')
+        f.write('{}')
+        f.close()
+        send_mail('The progrom is running...', '')
 
 
 # 简版
@@ -140,6 +161,31 @@ def gzdecode(data):
 
 def getTime():
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+
+
+def send_mail(title, content):
+    mail_host = 'smtp.163.com'
+    mail_user = 'xxx'
+    mail_pass = 'xxxx'
+    sender = 'xxxxx@163.com'
+    receivers = ['xxxxx@163.com']
+
+    message = MIMEText(content, 'plain', 'utf-8')
+    message['Subject'] = title
+    message['From'] = sender
+    message['To'] = receivers[0]
+
+    try:
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect(mail_host, 25)
+        smtpObj.login(mail_user, mail_pass)
+        smtpObj.sendmail(
+            sender, receivers, message.as_string())
+        smtpObj.quit()
+        print('mail send success')
+        logging.info('send to ' + receivers[0] + ',content:' + content)
+    except smtplib.SMTPException as e:
+        print('mail send error', e)
 
 
 if __name__ == '__main__':
