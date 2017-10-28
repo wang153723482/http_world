@@ -37,7 +37,7 @@ public class HelloController {
         return "name:"+name+",age:"+age;
     }
     
-    //http post 请求，返回cookie
+    //http get 请求，返回cookie
     @RequestMapping(value = "/helloCookie1",method = RequestMethod.GET)
     public String helloCookie1(HttpServletRequest request, HttpServletResponse response){
         Cookie cookie = new Cookie("mycookie","aaaaaa1");
@@ -59,7 +59,7 @@ public class HelloController {
         }
     }
     
-    @RequestMapping(value = "helloHeader",method = RequestMethod.GET)
+    @RequestMapping(value = "/helloHeader",method = RequestMethod.GET)
     public String helloHeader(HttpServletRequest request,HttpServletResponse response){
         String result = "";
         Enumeration<String> e = request.getHeaderNames();
