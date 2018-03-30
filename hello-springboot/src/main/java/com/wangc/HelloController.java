@@ -23,6 +23,13 @@ public class HelloController {
         System.out.println("hello get");
         return "{'name':'wangc','age':12}";
     }
+    
+    //http get 无参请求，直接返回json字符串
+    @RequestMapping(value="/hello_put",method = RequestMethod.PUT)
+    public String hello2(@RequestBody String s){
+        System.out.println("接收到的参数为："+s);
+        return "{'name':'wangc','age':12}";
+    }
 
     //http post 有参body请求，直接返回请求参数+时间戳
     @RequestMapping(value="/hello",method = RequestMethod.POST)
@@ -31,12 +38,12 @@ public class HelloController {
         return s+System.currentTimeMillis();
     }
     
-    //http post 有参键值对请求，返回对应的字符串
+   //http post 有参键值对请求，返回对应的字符串
     @RequestMapping(value = "/helloPara",method=RequestMethod.POST)
     public String helloPara(@RequestParam String name,String age){
         return "name:"+name+",age:"+age;
     }
-    
+
     //http get 请求，返回cookie
     @RequestMapping(value = "/helloCookie1",method = RequestMethod.GET)
     public String helloCookie1(HttpServletRequest request, HttpServletResponse response){
@@ -59,7 +66,7 @@ public class HelloController {
         }
     }
     
-    @RequestMapping(value = "/helloHeader",method = RequestMethod.GET)
+    @RequestMapping(value = "/helloHeader",method = {RequestMethod.POST,RequestMethod.GET})
     public String helloHeader(HttpServletRequest request,HttpServletResponse response){
         String result = "";
         Enumeration<String> e = request.getHeaderNames();
