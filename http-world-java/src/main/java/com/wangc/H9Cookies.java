@@ -24,7 +24,7 @@ public class H9Cookies {
         CookieStore cookieStore = new BasicCookieStore();
         BasicClientCookie cookie = new BasicClientCookie("JSESSIONID","wangc");
         cookie.setAttribute("name1","wangc1");
-        cookie.setDomain(".127.0.0.1");//可以设置空字符串，但是domain不能为null
+        cookie.setDomain(".127.0.0.1");// ###### 可以设置空字符串，但是domain不能为null ######
         cookieStore.addCookie(cookie);
         CloseableHttpClient client = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
         
