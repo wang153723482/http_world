@@ -21,7 +21,7 @@ public class HelloController {
     @RequestMapping(value="/hello",method = RequestMethod.GET)
     public String hello(){
         System.out.println("hello get");
-        return "{'name':'wangc','age':12}";
+        return "{'name':'wangc','age':12,'pet':{'p_type':'dog'}}";
     }
     
     //http get 无参请求，直接返回json字符串
@@ -38,6 +38,13 @@ public class HelloController {
         return s+System.currentTimeMillis();
     }
     
+    //http post 有参body请求，直接返回请求参数+时间戳
+    @RequestMapping(value="/helloJson",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
+    public String helloPostJson(@RequestBody String s){
+        System.out.println("hello post");
+        return s+System.currentTimeMillis();
+    }
+    
    //http post 有参键值对请求，返回对应的字符串
     @RequestMapping(value = "/helloPara",method=RequestMethod.POST)
     public String helloPara(@RequestParam String name,String age){
@@ -49,6 +56,7 @@ public class HelloController {
     public String helloCookie1(HttpServletRequest request, HttpServletResponse response){
         Cookie cookie = new Cookie("mycookie","aaaaaa1");
         response.addCookie(cookie);
+        response.setContentType("");
         return "you get cookie";
     }
     
