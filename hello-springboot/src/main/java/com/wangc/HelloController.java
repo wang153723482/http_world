@@ -52,7 +52,7 @@ public class HelloController {
     }
 
     //http post 有参body请求，直接返回请求参数+时间戳
-    @RequestMapping(value = "/hello", method = RequestMethod.POST)
+    @RequestMapping(value = "/hello_body", method = RequestMethod.POST)
     public String helloPost(@RequestBody String s) {
         System.out.println("hello post" + s);
         return s + System.currentTimeMillis();
@@ -69,6 +69,11 @@ public class HelloController {
     @RequestMapping(value = "/helloPara", method = RequestMethod.POST)
     public String helloPara(@RequestParam String name, String age) {
         return "name:" + name + ",age:" + age;
+    }
+    //http post 有参键值对请求，返回对应的字符串
+    @RequestMapping(value = "/helloParaGet", method = RequestMethod.GET)
+    public String helloParaGet(@RequestParam String name, String age) {
+        return "method:get,name:" + name + ",age:" + age;
     }
 
     //http get 请求，返回cookie
