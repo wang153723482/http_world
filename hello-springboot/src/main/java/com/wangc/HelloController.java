@@ -16,82 +16,102 @@ import java.util.Enumeration;
 
 @RestController
 public class HelloController {
-    
+
     //http get 无参请求，直接返回json字符串
-    @RequestMapping(value="/hello",method = RequestMethod.GET)
-    public String hello(){
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public String hello() {
         System.out.println("hello get");
-        return "{'name':'wangc','age':12,'pet':{'p_type':'dog'}}";
+        return "{'mark':'you are get','name':'wangc','age':12,'pet':{'p_type':'dog'}}";
     }
-    
+
     //http get 无参请求，直接返回json字符串
-    @RequestMapping(value="/hello_put",method = RequestMethod.PUT)
-    public String hello2(@RequestBody String s){
-        System.out.println("接收到的参数为："+s);
+    @RequestMapping(value = "/hello", method = RequestMethod.POST)
+    public String hello_post(HttpServletRequest request) {
+        System.out.println("hello post");
+        System.out.println("helloSession");
+        String sessionId = request.getSession().getId();
+        System.out.println("session id :"+sessionId);
+        return "{'session_id':'"+sessionId+"','name':'wangc','age':12,'pet':{'p_type':'dog'}}";
+    }
+
+    //http get 无参请求，返回session id
+    @RequestMapping(value = "/helloSession", method = RequestMethod.GET)
+    public String helloSession(HttpServletRequest request) {
+        System.out.println("helloSession");
+        String sessionId = request.getSession().getId();
+        System.out.println("helloSession  session id :"+sessionId);
+        return "{'session_id':'"+sessionId+"','name':'wangc','age':12,'pet':{'p_type':'dog'}}";
+    }
+
+
+    //http get 无参请求，直接返回json字符串
+    @RequestMapping(value = "/hello_put", method = RequestMethod.PUT)
+    public String hello2(@RequestBody String s) {
+        System.out.println("接收到的参数为：" + s);
         return "{'name':'wangc','age':12}";
     }
 
     //http post 有参body请求，直接返回请求参数+时间戳
-    @RequestMapping(value="/hello",method = RequestMethod.POST)
-    public String helloPost(@RequestBody String s){
-        System.out.println("hello post");
-        return s+System.currentTimeMillis();
+    @RequestMapping(value = "/hello", method = RequestMethod.POST)
+    public String helloPost(@RequestBody String s) {
+        System.out.println("hello post" + s);
+        return s + System.currentTimeMillis();
     }
-    
+
     //http post 有参body请求，直接返回请求参数+时间戳
-    @RequestMapping(value="/helloJson",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
-    public String helloPostJson(@RequestBody String s){
-        System.out.println("hello post");
-        return s+System.currentTimeMillis();
+    @RequestMapping(value = "/helloJson", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public String helloPostJson(@RequestBody String s) {
+        System.out.println("hello post" + s);
+        return s + System.currentTimeMillis();
     }
-    
-   //http post 有参键值对请求，返回对应的字符串
-    @RequestMapping(value = "/helloPara",method=RequestMethod.POST)
-    public String helloPara(@RequestParam String name,String age){
-        return "name:"+name+",age:"+age;
+
+    //http post 有参键值对请求，返回对应的字符串
+    @RequestMapping(value = "/helloPara", method = RequestMethod.POST)
+    public String helloPara(@RequestParam String name, String age) {
+        return "name:" + name + ",age:" + age;
     }
 
     //http get 请求，返回cookie
-    @RequestMapping(value = "/helloCookie1",method = RequestMethod.GET)
-    public String helloCookie1(HttpServletRequest request, HttpServletResponse response){
-        Cookie cookie = new Cookie("mycookie","aaaaaa1");
+    @RequestMapping(value = "/helloCookie1", method = RequestMethod.GET)
+    public String helloCookie1(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = new Cookie("mycookie", "aaaaaa1");
         response.addCookie(cookie);
         response.setContentType("");
         return "you get cookie";
     }
-    
+
     //http post 请求，获取cookie，如果有ok，没有报错
-    @RequestMapping(value = "/helloCookie2",method = RequestMethod.GET)
-    public String helloCookie2(HttpServletRequest request, HttpServletResponse response){
+    @RequestMapping(value = "/helloCookie2", method = RequestMethod.GET)
+    public String helloCookie2(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
-        
-        if(null!=cookies 
-                && cookies.length>0 
-                && "mycookie".equals(cookies[0].getName())){
+
+        if (null != cookies
+                && cookies.length > 0
+                && "mycookie".equals(cookies[0].getName())) {
             return "you have cookie,you are right.";
-        }else{
+        } else {
             return "you don't have cookie,no!";
         }
     }
-    
-    @RequestMapping(value = "/helloHeader",method = {RequestMethod.POST,RequestMethod.GET})
-    public String helloHeader(HttpServletRequest request,HttpServletResponse response){
+
+    @RequestMapping(value = "/helloHeader", method = {RequestMethod.POST, RequestMethod.GET})
+    public String helloHeader(HttpServletRequest request, HttpServletResponse response) {
         String result = "";
         Enumeration<String> e = request.getHeaderNames();
-        while (e.hasMoreElements()){
+        while (e.hasMoreElements()) {
             String tmp = e.nextElement();
-            result += (tmp+":"+request.getHeader(tmp)+"\n"); 
+            result += (tmp + ":" + request.getHeader(tmp) + "\n");
         }
         System.out.println(result);
-        return "server get your heads.\n"+result;
+        return "server get your heads.\n" + result;
     }
-    
-    @RequestMapping(value = "helloUpload",method = RequestMethod.POST)
+
+    @RequestMapping(value = "helloUpload", method = RequestMethod.POST)
     public String helloUpload(@RequestParam MultipartFile file,
                               @RequestParam String name,
-                              @RequestParam String age){
-        String fileAllPath = System.getProperty("user.dir")+File.separator + file.getOriginalFilename(); //完整路径
-        System.out.println( fileAllPath );
+                              @RequestParam String age) {
+        String fileAllPath = System.getProperty("user.dir") + File.separator + file.getOriginalFilename(); //完整路径
+        System.out.println(fileAllPath);
         if (!file.isEmpty()) {
             try {
                 BufferedOutputStream out = new BufferedOutputStream(
@@ -105,12 +125,12 @@ public class HelloController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
+        } else {
             System.out.println("file is empty.");
         }
-        return "file is save at:"+fileAllPath
-                +"<br>name:"+name
-                +"<br>age:"+age;
+        return "file is save at:" + fileAllPath
+                + "<br>name:" + name
+                + "<br>age:" + age;
     }
 
 }
